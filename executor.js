@@ -1,12 +1,24 @@
 console.debug("executor.js загружен");
 
-let variables = {}; // 🔹 Глобальные переменные для текущего запуска
+function substituteQuery(value, queryArgs) {
+  if (typeof value !== "string") return value;
+  return value.replace(/q\{([^\}]+)\}/g, (_, key) => {
+    return queryArgs[key] !== undefined ? queryArgs[key] : "";
+  });
+}
 
-/**
- * Выполнение шага по правилу
- */
 async function executeRule(rule) {
   console.debug("Начало выполнения правила:", rule.url);
+
+  // Получаем query-параметры для подстановок
+  const queryArgs = {};
+  const params = new URLSearchParams(window.location.search);
+  for (const [key, value] of params.entries()) {
+    if (key.startsWith("__ext_")) {
+      queryArgs[key.replace("__ext_", "")] = value;
+    }
+  }
+
   for (let index = 0; index < rule.steps.length; index++) {
     const step = rule.steps[index];
     if (!step.enabled) {
@@ -18,7 +30,6 @@ async function executeRule(rule) {
     try {
       let el = null;
 
-      // поддержка старых правил
       if (step.selector && step.selectorType) {
         step.selectors = [{ type: step.selectorType, value: step.selector }];
       }
@@ -27,49 +38,36 @@ async function executeRule(rule) {
         for (const sel of step.selectors) {
           if (!sel.value) continue;
           if (sel.type === "xpath") {
-            console.debug(`Пробую XPath: ${sel.value}`);
             el = document.evaluate(sel.value, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
           } else if (sel.type === "css") {
-            console.debug(`Пробую CSS: ${sel.value}`);
             el = document.querySelector(sel.value);
           }
-          if (el) {
-            console.debug(`Элемент найден по ${sel.type}:`, el);
-            break;
-          }
+          if (el) break;
         }
       }
 
       switch (step.type) {
         case "fill":
-          if (!el) {
-            console.warn(`Элемент не найден`);
-            continue;
-          }
+          if (!el) { console.warn("Элемент не найден"); continue; }
+          const stepValue = substituteQuery(step.value, queryArgs); // <-- подстановка q{}
           if (el.tagName === "INPUT") {
-            if (el.type === "checkbox") {
-              el.checked = !!step.value;
-            } else if (el.type === "radio") {
+            if (el.type === "checkbox") el.checked = !!stepValue;
+            else if (el.type === "radio") {
               const radios = document.getElementsByName(el.name);
-              Array.from(radios).forEach(r => {
-                r.checked = (r.value === step.value);
-              });
-            } else {
-              el.value = step.value;
-            }
+              Array.from(radios).forEach(r => { r.checked = r.value === stepValue; });
+            } else el.value = stepValue;
           } else if (el.tagName === "SELECT") {
-            const option = Array.from(el.options).find(o => o.value === step.value || o.text === step.value);
+            const option = Array.from(el.options).find(o => o.value === stepValue || o.text === stepValue);
             if (option) el.value = option.value;
           } else {
-            el.textContent = step.value;
+            el.textContent = stepValue;
           }
           el.dispatchEvent(new Event("input", { bubbles: true }));
           el.dispatchEvent(new Event("change", { bubbles: true }));
           break;
 
         case "click":
-          if (el) el.click();
-          else console.warn("Элемент для клика не найден");
+          if (el) el.click(); else console.warn("Элемент для клика не найден");
           break;
 
         case "wait":
@@ -85,7 +83,8 @@ async function executeRule(rule) {
           break;
 
         case "setPrompt":
-          window.postMessage({ fromContentScript: true, action: "setPromptValue", value: step.value }, "*");
+          const promptValue = substituteQuery(step.value, queryArgs);
+          window.postMessage({ fromContentScript: true, action: "setPromptValue", value: promptValue }, "*");
           break;
 
         default:
@@ -96,7 +95,6 @@ async function executeRule(rule) {
     }
   }
 }
-
 
 function findMatchingRule(rules, url, autoRun) {
   console.debug("Поиск подходящего правила для URL:", url);
