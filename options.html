@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Autofill Rules</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div id="app">
+    <div id="sidebar">
+      <h2>Правила</h2>
+      <div id="ruleList"></div>
+      <button id="addRuleBtn">➕ Добавить правило</button>
+      <button id="exportRulesBtn">⬇ Экспорт</button>
+      <label class="import-label">
+        ⬆ Импорт
+        <input type="file" id="importRulesInput" accept="application/json" hidden />
+      </label>
+    </div>
+
+    <div id="main">
+      <div id="ruleDetailsContainer"></div>
+      <div class="actions">
+        <button id="saveRulesBtn">💾 Сохранить все правила</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="notification"></div>
+  <script src="options.js"></script>
+</body>
+</html>

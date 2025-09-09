@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Автозаполнение</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 10px;
+      width: 300px;
+      background-color: #f0f0f0;
+    }
+    h2 {
+      font-size: 16px;
+      margin: 0 0 10px;
+      color: #333;
+    }
+    select {
+      width: 100%;
+      padding: 6px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    button {
+      width: 100%;
+      padding: 6px 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: background-color 0.2s;
+    }
+    #fillButton {
+      background-color: #007bff;
+      color: #fff;
+    }
+    #fillButton:hover {
+      background-color: #0056b3;
+    }
+    #fillButton:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+    #executeButton {
+      background-color: #28a745;
+      color: #fff;
+    }
+    #executeButton:hover {
+      background-color: #1e7e34;
+    }
+    .settings-link {
+      display: block;
+      text-align: center;
+      font-size: 14px;
+      color: #007bff;
+      text-decoration: none;
+      margin-top: 10px;
+    }
+    .settings-link:hover {
+      text-decoration: underline;
+    }
+    .notification {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #28a745;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+      z-index: 1000;
+    }
+    .notification.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <h2>Автозаполнение</h2>
+  <select id="ruleSelect">
+    <option value="">Выберите правило...</option>
+  </select>
+  <button id="fillButton" disabled>Выполнить выбранное</button>
+  <button id="executeButton">Выполнить</button>
+  <a href="#" id="settingsLink" class="settings-link">Открыть настройки</a>
+  <div id="notification" class="notification"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
