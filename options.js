@@ -322,38 +322,52 @@ stepEl.querySelector(".duplicateStep").addEventListener("click", () => {
 
   
 
-  function renderSelectors(container, selectors) {
-    container.innerHTML = "";
-    selectors.forEach((sel, idx) => {
-      const row = document.createElement("div");
-      row.className = "selector-row";
-      row.innerHTML = `
-        <select class="selector-type">
-          <option value="xpath" ${sel.type === "xpath" ? "selected" : ""}>XPath</option>
-          <option value="css" ${sel.type === "css" ? "selected" : ""}>CSS</option>
-        </select>
-        <textarea class="selector-value">${sel.value}</textarea>
-        <button class="deleteSelector">✖</button>
-      `;
-      row.querySelector(".selector-type").addEventListener("change", autoSave);
-      row.querySelector(".selector-value").addEventListener("input", autoSave);
-      row.querySelector(".deleteSelector").addEventListener("click", () => {
-        selectors.splice(idx, 1);
-        renderSelectors(container, selectors);
-        autoSave();
-      });
-      container.appendChild(row);
-    });
+function renderSelectors(container, selectors) {
+  container.innerHTML = "";
 
-    const addBtn = document.createElement("button");
-    addBtn.textContent = "Добавить селектор";
-    addBtn.addEventListener("click", () => {
-      selectors.push({ type: "xpath", value: "" });
+  function updateSelectorsFromUI() {
+    const rows = container.querySelectorAll(".selector-row");
+    rows.forEach((row, idx) => {
+      const selType = row.querySelector(".selector-type").value;
+      const selValue = row.querySelector(".selector-value").value;
+      selectors[idx] = { type: selType, value: selValue };
+    });
+  }
+
+  selectors.forEach((sel, idx) => {
+    const row = document.createElement("div");
+    row.className = "selector-row";
+    row.innerHTML = `
+      <select class="selector-type">
+        <option value="xpath" ${sel.type === "xpath" ? "selected" : ""}>XPath</option>
+        <option value="css" ${sel.type === "css" ? "selected" : ""}>CSS</option>
+      </select>
+      <textarea class="selector-value">${sel.value}</textarea>
+      <button class="deleteSelector">✖</button>
+    `;
+
+    row.querySelector(".selector-type").addEventListener("change", autoSave);
+    row.querySelector(".selector-value").addEventListener("input", autoSave);
+    row.querySelector(".deleteSelector").addEventListener("click", () => {
+      updateSelectorsFromUI();
+      selectors.splice(idx, 1);
       renderSelectors(container, selectors);
       autoSave();
     });
-    container.appendChild(addBtn);
-  }
+
+    container.appendChild(row);
+  });
+
+  const addBtn = document.createElement("button");
+  addBtn.textContent = "Добавить селектор";
+  addBtn.addEventListener("click", () => {
+    updateSelectorsFromUI(); // <-- сохраняем текущее состояние перед добавлением
+    selectors.push({ type: "xpath", value: "" });
+    renderSelectors(container, selectors);
+    autoSave();
+  });
+  container.appendChild(addBtn);
+}
 
   function updateStepNumbers() {
     const stepsContainer = document.querySelector(".stepsContainer");
