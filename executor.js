@@ -96,10 +96,30 @@ async function executeRule(rule) {
   }
 }
 
+function maskToRegex(mask) {
+  // Экранируем спецсимволы регулярок кроме * и #
+  let regexStr = mask.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+
+  // * → любой набор символов
+  regexStr = regexStr.replace(/\*/g, ".*");
+
+  // # → только цифры
+  regexStr = regexStr.replace(/#/g, "[0-9]+");
+
+  return new RegExp("^" + regexStr + "$");
+}
+
+function matchUrlByMask(mask, url) {
+  return maskToRegex(mask).test(url);
+}
+
 function findMatchingRule(rules, url, autoRun) {
   console.debug("Поиск подходящего правила для URL:", url);
-  return rules.find(rule => (rule.autoRun == autoRun || !autoRun) && url.includes(rule.url));
-}
+  return rules.find(rule => {
+    const autorunOk = (rule.autoRun == autoRun || !autoRun);
+    const matched = matchUrlByMask(rule.url, url);
+    return autorunOk && matched;
+  })};
 
 window.executeRule = executeRule;
 window.findMatchingRule = findMatchingRule;

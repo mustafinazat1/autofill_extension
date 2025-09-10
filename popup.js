@@ -14,10 +14,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }, duration);
   }
 
-  // локальный аналог findMatchingRule
-  function findMatchingRule(rules, url) {
-    return rules.find(rule => url.includes(rule.url));
-  }
+  function maskToRegex(mask) {
+  // Экранируем спецсимволы регулярок кроме * и #
+  let regexStr = mask.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+
+  // * → любой набор символов
+  regexStr = regexStr.replace(/\*/g, ".*");
+
+  // # → только цифры
+  regexStr = regexStr.replace(/#/g, "[0-9]+");
+
+  return new RegExp("^" + regexStr + "$");
+}
+
+function matchUrlByMask(mask, url) {
+  return maskToRegex(mask).test(url);
+}
+
+function findMatchingRule(rules, url, autoRun) {
+  console.debug("Поиск подходящего правила для URL:", url);
+  return rules.find(rule => {
+    const autorunOk = (rule.autoRun == autoRun || !autoRun);
+    const matched = matchUrlByMask(rule.url, url);
+    return autorunOk && matched;
+  })};
 
   // Загрузка правил и заполнение селектора
   chrome.storage.sync.get(["rules"], ({ rules }) => {
