@@ -28,11 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const autoSave = debounce(() => {
     updateCurrentRuleFromUI();
-    chrome.storage.sync.set({ groups }, () => console.debug("Автосохранение групп:", groups));
+    chrome.storage.local.set({ groups }, () => console.debug("Автосохранение групп:", groups));
   }, 1000);
 
   // Загрузка данных
-  chrome.storage.sync.get(["groups"], ({ groups: storedGroups }) => {
+  chrome.storage.local.get(["groups"], ({ groups: storedGroups }) => {
     groups = Array.isArray(storedGroups) ? storedGroups : [];
     renderRuleList();
   });
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   addGroupBtn.addEventListener("click", () => addGroup());
   saveRulesBtn.addEventListener("click", () => {
     updateCurrentRuleFromUI();
-    chrome.storage.sync.set({ groups }, () => showNotification("Правила сохранены!"));
+    chrome.storage.local.set({ groups }, () => showNotification("Правила сохранены!"));
   });
 
   exportRulesBtn.addEventListener("click", () => {

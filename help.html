@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Справка по расширению Autofill Extension 1.0</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #007bff;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        h3 {
+            font-size: 18px;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        p, li {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .note {
+            background-color: #e7f3ff;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Справка по расширению</h1>
+    <p>Это расширение для браузера Chrome предназначено для автоматизации взаимодействия с веб-страницами, упрощения работы с DOM-элементами и копирования селекторов и значений. Оно полезно для веб-разработчиков, тестировщиков и всех, кто хочет автоматизировать повторяющиеся задачи.</p>
+
+    <div class="section">
+        <h2>1. Контекстное меню для копирования селекторов и значений</h2>
+        <p>Расширение добавляет в контекстное меню браузера (по правому клику) следующие опции:</p>
+        <ul>
+            <li><strong>Copy CSS Selector</strong>: Копирует CSS-селектор активного элемента.
+                <ul>
+                    <li>Генерирует уникальный селектор, начиная с ID (если есть) или используя теги с модификатором <code>:nth-of-type</code>.</li>
+                    <li>Отображает всплывающее уведомление с скопированным селектором.</li>
+                </ul>
+            </li>
+            <li><strong>Copy XPath</strong>: Копирует XPath-путь активного элемента.
+                <ul>
+                    <li>Создает путь, начиная с ID или используя индексацию тегов.</li>
+                    <li>Показывает уведомление с скопированным XPath.</li>
+                </ul>
+            </li>
+            <li><strong>Copy Value</strong>: Копирует значение активного элемента.
+                <ul>
+                    <li>Для <code>&lt;select&gt;</code> показывает панель с опциями для выбора значения.</li>
+                    <li>Для <code>&lt;input type="radio"&gt;</code> отображает панель с радиокнопками.</li>
+                    <li>Для других элементов копирует <code>value</code> или <code>textContent</code>.</li>
+                    <li>Уведомление подтверждает копирование.</li>
+                </ul>
+            </li>
+            <li><strong>Copy Selector Variants</strong>: Показывает список различных селекторов для элемента.
+                <ul>
+                    <li>Включает CSS и XPath на основе ID, классов, атрибутов (<code>name</code>, <code>type</code>, <code>title</code>, <code>placeholder</code>, <code>data-*</code>), позиции (<code>:nth-of-type</code>) и текста (<code>contains(text)</code>).</li>
+                    <li>Позволяет выбрать и скопировать нужный селектор из панели.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>2. Автоматизация действий на веб-страницах</h2>
+        <p>Расширение позволяет создавать, сохранять и выполнять правила для автоматизации действий на страницах, соответствующих заданным URL-шаблонам.</p>
+
+        <h3>Создание и управление правилами</h3>
+        <ul>
+            <li>Правила организованы в группы с названиями.</li>
+            <li>Каждое правило включает:
+                <ul>
+                    <li>Название (<code>title</code>).</li>
+                    <li>URL-шаблон (поддерживает <code>*</code> для любых символов и <code>#</code> для цифр).</li>
+                    <li>Флаг автозапуска (<code>autoRun</code>).</li>
+                    <li>Список шагов (<code>steps</code>) с действиями.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>Типы шагов</h3>
+        <ul>
+            <li><strong>fill</strong>: Заполняет элемент значением.
+                <ul>
+                    <li>Для <code>&lt;input&gt;</code> (включая <code>checkbox</code>, <code>radio</code>) устанавливает значение или состояние.</li>
+                    <li>Для <code>&lt;select&gt;</code> выбирает опцию по значению или тексту.</li>
+                    <li>Для других элементов изменяет <code>textContent</code>.</li>
+                    <li>Поддерживает подстановку из query-параметров (<code>q{key}</code>).</li>
+                </ul>
+            </li>
+            <li><strong>click</strong>: Выполняет клик по элементу (CSS или XPath).</li>
+            <li><strong>wait</strong>: Ожидает заданное время (в секундах).</li>
+            <li><strong>blockAlert</strong>: Блокирует вызовы <code>window.alert</code>.</li>
+            <li><strong>setConfirm</strong>: Задает значение для <code>window.confirm</code> (0 = OK, 1 = Cancel).</li>
+            <li><strong>setPrompt</strong>: Задает значение для <code>window.prompt</code>.</li>
+        </ul>
+
+        <h3>Селекторы</h3>
+        <ul>
+            <li>Поддерживаются CSS и XPath селекторы.</li>
+            <li>Можно указать несколько селекторов для шага; используется первый найденный элемент.</li>
+        </ul>
+
+        <h3>Автозапуск</h3>
+        <ul>
+            <li>Правила с <code>autoRun: true</code> выполняются автоматически при загрузке страницы, если URL соответствует шаблону.</li>
+            <li>При наличии нескольких подходящих правил пользователь выбирает одно через всплывающее окно.</li>
+        </ul>
+
+        <h3>Query-параметры</h3>
+        <p>Значения из URL-параметров (начинающихся с <code>__ext_</code>) подставляются в шаги (например, <code>q{param}</code> для <code>?__ext_param=value</code>).</p>
+    </div>
+
+    <div class="section">
+        <h2>3. Интерфейс управления правилами</h2>
+        <ul>
+            <li><strong>Добавление/редактирование</strong>: Создание групп, правил и шагов с указанием названий, URL, селекторов и значений.</li>
+            <li><strong>Импорт/экспорт</strong>: Экспорт правил в <code>autofill_rules.json</code> и импорт из JSON с проверкой структуры.</li>
+            <li><strong>Автосохранение</strong>: Изменения сохраняются в <code>chrome.storage.local</code> с небольшой задержкой.</li>
+            <li><strong>Удаление/дублирование</strong>: Поддерживается удаление и копирование групп, правил и шагов.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>4. Перехват диалоговых окон</h2>
+        <ul>
+            <li><strong>alert</strong>: Может блокироваться (шаг <code>blockAlert</code>), сообщения записываются в консоль.</li>
+            <li><strong>confirm</strong>: Возвращает заданное значение (0 = OK, 1 = Cancel) через шаг <code>setConfirm</code>.</li>
+            <li><strong>prompt</strong>: Возвращает заданное значение через шаг <code>setPrompt</code>, включая подстановку из query-параметров.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>5. Всплывающее окно (Popup)</h2>
+        <ul>
+            <li><strong>Выбор правила</strong>: Позволяет выбрать и выполнить правило на активной вкладке.</li>
+            <li><strong>Настройки</strong>: Открывает страницу управления правилами.</li>
+            <li>Если правил нет, отображается сообщение об их отсутствии.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>6. Технические особенности</h2>
+        <ul>
+            <li><strong>Скрипты</strong>:
+                <ul>
+                    <li><code>content.js</code>: Управляет контекстным меню, выполнением правил и инъекцией <code>injected.js</code>.</li>
+                    <li><code>injected.js</code>: Перехватывает <code>alert</code>, <code>confirm</code>, <code>prompt</code>.</li>
+                    <li><code>options.js</code>: Интерфейс настроек.</li>
+                    <li><code>popup.js</code>: Управляет всплывающим окном.</li>
+                </ul>
+            </li>
+            <li><strong>Хранение данных</strong>: Правила хранятся через <code>chrome.storage.local</code>.</li>
+            <li><strong>Уведомления</strong>: Toast-уведомления для копирования и действий, уведомления в настройках и popup.</li>
+            <li><strong>Логирование</strong>: Используется <code>console.debug</code> для отладки.</li>
+        </ul>
+    </div>
+
+    <div class="note">
+        <p><strong>Примечание</strong>: Это расширение идеально подходит для автоматизации повторяющихся задач, тестирования веб-приложений и упрощения работы с DOM. Для настройки правил откройте страницу настроек через всплывающее окно.</p>
+    </div>
+</body>
+</html>

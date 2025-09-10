@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Примеры использования расширения</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #007bff;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        h3 {
+            font-size: 18px;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        p, li {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        ul, ol {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .note {
+            background-color: #e7f3ff;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            margin-bottom: 15px;
+        }
+        .example {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Примеры использования и создание правил для расширения</h1>
+    <p>Этот документ дополняет основную справку и содержит примеры использования расширения, а также рекомендации по созданию правил для автоматизации действий на веб-страницах.</p>
+
+    <div class="section">
+        <h2>1. Примеры использования</h2>
+        <p>Ниже приведены практические примеры, демонстрирующие, как использовать функции расширения для копирования селекторов, значений и автоматизации задач.</p>
+
+        <div class="example">
+            <h3>Пример 1: Копирование CSS-селектора и XPath для элемента</h3>
+            <p>Допустим, вы хотите получить селектор для текстового поля на странице формы.</p>
+            <ol>
+                <li>Перейдите на веб-страницу с формой (например, <code>https://example.com/form</code>).</li>
+                <li>Кликните правой кнопкой мыши на текстовом поле (например, <code>&lt;input id="username"&gt;</code>).</li>
+                <li>Выберите <strong>Copy CSS Selector</strong>. Расширение скопирует селектор, например: <code>#username</code>.</li>
+                <li>Выберите <strong>Copy XPath</strong>. Расширение скопирует XPath, например: <code>//*[@id="username"]</code>.</li>
+                <li>После копирования появится уведомление с текстом селектора, например: <code>Copied: #username</code>.</li>
+            </ol>
+            <p><strong>Использование</strong>: Полученные селекторы можно использовать в скриптах автоматизации (например, Selenium) или для создания правил в расширении.</p>
+        </div>
+
+        <div class="example">
+            <h3>Пример 2: Копирование значения из выпадающего списка</h3>
+            <p>Вы хотите скопировать значение из элемента <code>&lt;select&gt;</code> на странице.</p>
+            <ol>
+                <li>Кликните правой кнопкой мыши на выпадающем списке (например, <code>&lt;select name="country"&gt;</code>).</li>
+                <li>Выберите <strong>Copy Value</strong>.</li>
+                <li>Появится панель с доступными опциями (например, <code>USA (us)</code>, <code>Canada (ca)</code>).</li>
+                <li>Кликните на нужную опцию, чтобы скопировать её значение (например, <code>us</code>).</li>
+                <li>Уведомление подтвердит: <code>Copied: us</code>.</li>
+            </ol>
+            <p><strong>Использование</strong>: Это удобно для тестирования или извлечения данных из форм.</p>
+        </div>
+
+        <div class="example">
+            <h3>Пример 3: Автоматизация заполнения формы</h3>
+            <p>Вы хотите автоматически заполнить форму на странице <code>https://example.com/login</code> с логином и паролем.</p>
+            <ol>
+                <li>Откройте страницу настроек расширения (через всплывающее окно, нажав на ссылку "Настройки").</li>
+                <li>Создайте новую группу, например, <code>Авторизация</code>.</li>
+                <li>Добавьте правило с названием <code>Логин на example.com</code> и URL-шаблоном <code>https://example.com/login</code>.</li>
+                <li>Добавьте два шага:
+                    <ul>
+                        <li><strong>Шаг 1</strong>: Тип <code>fill</code>, селектор <code>#username</code> (CSS), значение <code>myuser</code>, описание <code>Заполнить логин</code>.</li>
+                        <li><strong>Шаг 2</strong>: Тип <code>fill</code>, селектор <code>#password</code> (CSS), значение <code>mypassword</code>, описание <code>Заполнить пароль</code>.</li>
+                    </ul>
+                </li>
+                <li>Установите флаг <code>Автозапуск</code> для автоматического выполнения.</li>
+                <li>Сохраните правило и перейдите на <code>https://example.com/login</code>. Поля логина и пароля будут автоматически заполнены.</li>
+            </ol>
+            <p><strong>Использование</strong>: Это экономит время при тестировании или частом заполнении форм.</p>
+        </div>
+
+        <div class="example">
+            <h3>Пример 4: Блокировка alert и установка значения confirm</h3>
+            <p>На странице появляется раздражающий <code>alert</code>, и вы хотите его заблокировать, а также автоматически ответить на <code>confirm</code>.</p>
+            <ol>
+                <li>Создайте правило для URL, например, <code>https://example.com/prompt-page</code>.</li>
+                <li>Добавьте шаги:
+                    <ul>
+                        <li><strong>Шаг 1</strong>: Тип <code>blockAlert</code>, без селектора, описание <code>Блокировать alert</code>.</li>
+                        <li><strong>Шаг 2</strong>: Тип <code>setConfirm</code>, значение <code>0</code> (для OK), описание <code>Подтвердить действие</code>.</li>
+                    </ul>
+                </li>
+                <li>Включите автозапуск и сохраните.</li>
+                <li>При загрузке страницы <code>alert</code> будет заблокирован, а <code>confirm</code> автоматически вернёт OK.</li>
+            </ol>
+            <p><strong>Использование</strong>: Полезно для автоматизации тестов, где диалоговые окна мешают процессу.</p>
+        </div>
+
+        <div class="example">
+            <h3>Пример 5: Использование query-параметров</h3>
+            <p>Вы хотите заполнить поле формы значением из URL, например, <code>https://example.com/form?__ext_user=john</code>.</p>
+            <ol>
+                <li>Создайте правило с URL-шаблоном <code>https://example.com/form*</code>.</li>
+                <li>Добавьте шаг:
+                    <ul>
+                        <li>Тип <code>fill</code>, селектор <code>#username</code> (CSS), значение <code>q{user}</code>, описание <code>Заполнить имя из URL</code>.</li>
+                    </ul>
+                </li>
+                <li>Сохраните и откройте страницу <code>https://example.com/form?__ext_user=john</code>.</li>
+                <li>Поле <code>#username</code> будет заполнено значением <code>john</code>.</li>
+            </ol>
+            <p><strong>Использование</strong>: Удобно для динамического заполнения форм на основе параметров URL.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2. Как правильно создавать правила</h2>
+        <p>Создание эффективных правил требует понимания структуры веб-страницы и правильного использования селекторов. Вот пошаговые рекомендации:</p>
+
+        <h3>Шаг 1: Определите цель</h3>
+        <ul>
+            <li>Решите, какие действия вы хотите автоматизировать (например, заполнение формы, клик по кнопке, блокировка диалогов).</li>
+            <li>Определите URL страницы, на которой будет выполняться правило.</li>
+        </ul>
+
+        <h3>Шаг 2: Получите селекторы</h3>
+        <ul>
+            <li>Используйте контекстное меню (<strong>Copy CSS Selector</strong>, <strong>Copy XPath</strong>, или <strong>Copy Selector Variants</strong>) для получения селекторов целевых элементов.</li>
+            <li>Проверьте селекторы:
+                <ul>
+                    <li>Для CSS: используйте <code>document.querySelector("селектор")</code> в консоли браузера.</li>
+                    <li>Для XPath: используйте <code>document.evaluate("селектор", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue</code>.</li>
+                </ul>
+            </li>
+            <li>Выбирайте наиболее надёжные селекторы:
+                <ul>
+                    <li>Предпочтительно использовать ID (<code>#id</code> или <code>//*[@id="id"]</code>).</li>
+                    <li>Если ID нет, используйте уникальные классы или атрибуты.</li>
+                    <li>Избегайте длинных путей, зависящих от структуры DOM, так как она может измениться.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>Шаг 3: Создайте группу и правило</h3>
+        <ul>
+            <li>Откройте настройки расширения.</li>
+            <li>Создайте группу (например, <code>Тестирование форм</code>).</li>
+            <li>Добавьте правило, указав:
+                <ul>
+                    <li><strong>Название</strong>: Описательное название, например, <code>Заполнение формы логина</code>.</li>
+                    <li><strong>URL-шаблон</strong>: Используйте маски:
+                        <ul>
+                            <li><code>*</code> — любой набор символов (например, <code>https://example.com/*</code>).</li>
+                            <li><code>#</code> — цифры (например, <code>https://example.com/page/#</code>).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Автозапуск</strong>: Включите, если правило должно выполняться автоматически.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>Шаг 4: Добавьте шаги</h3>
+        <ul>
+            <li>Для каждого действия добавьте шаг с типом (<code>fill</code>, <code>click</code>, <code>wait</code>, и т.д.).</li>
+            <li>Укажите селектор (CSS или XPath) и значение (если требуется).</li>
+            <li>Пример шага для заполнения:
+                <pre>
+{
+  "type": "fill",
+  "selectors": [
+    { "type": "css", "value": "#username" }
+  ],
+  "value": "testuser",
+  "description": "Заполнить поле логина",
+  "enabled": true
+}
+                </pre>
+            </li>
+            <li>Для динамических значений используйте <code>q{key}</code> с query-параметрами.</li>
+        </ul>
+
+        <h3>Шаг 5: Тестируйте правило</h3>
+        <ul>
+            <li>Сохраните правило и откройте целевую страницу.</li>
+            <li>Если включён автозапуск, правило выполнится автоматически.</li>
+            <li>Или используйте всплывающее окно (Popup) для ручного выполнения.</li>
+            <li>Проверьте логи в консоли браузера (<code>console.debug</code>) для диагностики ошибок.</li>
+        </ul>
+
+        <h3>Шаг 6: Экспорт и импорт</h3>
+        <ul>
+            <li>Экспортируйте правила в JSON для резервного копирования или переноса.</li>
+            <li>Импортируйте правила, убедившись, что JSON соответствует структуре (массив групп с правилами и шагами).</li>
+        </ul>
+
+        <div class="note">
+            <p><strong>Совет</strong>: Для сложных страниц используйте <strong>Copy Selector Variants</strong>, чтобы выбрать наиболее устойчивый селектор. Тестируйте правила на разных сценариях, чтобы учесть возможные изменения DOM.</p>
+        </div>
+    </div>
+
+    <div class="note">
+        <p><strong>Примечание</strong>: Расширение сохраняет правила в <code>chrome.storage.local</code>. Используйте логи в консоли для отладки и убедитесь, что селекторы уникальны и надёжны.</p>
+    </div>
+</body>
+</html>

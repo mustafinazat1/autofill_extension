@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Загрузка групп и заполнение селектора
-  chrome.storage.sync.get(["groups"], ({ groups }) => {
+  chrome.storage.local.get(["groups"], ({ groups }) => {
     if (!groups || !Array.isArray(groups) || groups.length === 0) {
       ruleSelect.innerHTML = '<option value="">Нет доступных правил</option>';
       fillButton.disabled = true;
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    chrome.storage.sync.get(["groups"], ({ groups }) => {
+    chrome.storage.local.get(["groups"], ({ groups }) => {
       const group = groups[groupIndex];
       if (!group || !group.rules) {
         showNotification("Группа не найдена!");

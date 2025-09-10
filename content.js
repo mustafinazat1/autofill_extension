@@ -5,7 +5,7 @@ injectedScript.src = chrome.runtime.getURL("injected.js");
 injectedScript.onload = () => console.debug("injected.js добавлен в страницу:", window.location.href);
 document.documentElement.appendChild(injectedScript);
 
-chrome.storage.sync.get(["groups"], ({ groups }) => {
+chrome.storage.local.get(["groups"], ({ groups }) => {
   console.debug("Получены группы:", groups);
   if (!groups || !Array.isArray(groups)) {
     console.debug("Группы отсутствуют или некорректны");
