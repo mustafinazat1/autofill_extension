@@ -133,15 +133,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const groupEl = document.createElement("div");
       groupEl.className = "group mb-2";
 
-      const header = document.createElement("div");
-      header.className = "group-header p-2";
+ const header = document.createElement("div");
+header.className = "group-header p-2 d-flex flex-column"; // flex-column для вертикального расположения
 
-      const nameInput = document.createElement("input");
-      nameInput.className = "group-name-input form-control form-control-sm mb-2";
-      nameInput.value = group.groupName;
+const nameInput = document.createElement("input");
+nameInput.className = "group-name-input form-control form-control-sm mb-1"; // чуть меньше отступ
+nameInput.value = group.groupName;
 
-      const buttonsContainer = document.createElement("div");
-      buttonsContainer.className = "group-header-buttons d-flex gap-2";
+const buttonsContainer = document.createElement("div");
+buttonsContainer.className = "group-header-buttons d-flex gap-2"; // кнопки под названием
 
       const toggleBtn = document.createElement("button");
       toggleBtn.className = "toggleGroup btn btn-secondary btn-sm";
@@ -169,8 +169,8 @@ document.addEventListener("DOMContentLoaded", () => {
       nameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") nameInput.blur(); });
 
       const rulesContainer = document.createElement("div");
-      rulesContainer.className = "rules-in-group px-2 pb-2";
-
+      rulesContainer.className = "rules-in-group px-2 pb-2 collapsed";
+      toggleBtn.textContent = "►";
       toggleBtn.addEventListener("click", () => {
         rulesContainer.classList.toggle("collapsed");
         toggleBtn.textContent = rulesContainer.classList.contains("collapsed") ? "►" : "▼";
@@ -352,13 +352,19 @@ document.addEventListener("DOMContentLoaded", () => {
       autoSave();
     });
 
-    stepEl.querySelector(".duplicateStep").addEventListener("click", () => {
-      const dupStep = JSON.parse(JSON.stringify(step));
-      const idx = parseInt(stepEl.dataset.index);
-      groups[currentGroupIndex].rules[currentRuleIndex].steps.splice(idx + 1, 0, dupStep);
-      renderRuleDetails(groups[currentGroupIndex].rules[currentRuleIndex]);
-      autoSave();
-    });
+stepEl.querySelector(".duplicateStep").addEventListener("click", () => {
+  const steps = groups[currentGroupIndex].rules[currentRuleIndex].steps;
+  const idx = parseInt(stepEl.dataset.index); // актуальный индекс шага
+  const stepCopy = JSON.parse(JSON.stringify(steps[idx])); // глубокая копия
+  steps.splice(idx + 1, 0, stepCopy);
+
+  // перерисовываем только шаги, не весь ruleDetails
+  const stepsContainer = stepEl.parentElement;
+  stepsContainer.innerHTML = "";
+  steps.forEach((s, i) => addStepToUI(stepsContainer, s, i));
+
+  autoSave();
+});
 
     stepEl.querySelector(".moveUp").addEventListener("click", () => {
       const idx = parseInt(stepEl.dataset.index);
