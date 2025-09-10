@@ -479,7 +479,7 @@ function generateSelectors(element) {
   // XPath по тексту
   const text = (element.textContent || "").trim();
   if (text) {
-    const shortText = text.length > 20 ? text.slice(0, 20) + "…" : text;
+    const shortText = text.length > 200 ? text.slice(0, 200) + "" : text;
     list.push({
       type: "XPath contains(text)",
       value: makeUniqueXPath(`//${tag}[contains(normalize-space(.), "${shortText}")]`, element)
