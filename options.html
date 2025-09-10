@@ -3,30 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <title>Autofill Rules</title>
+  <link href="bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="options.css" />
 </head>
 <body>
-  <div id="app">
-    <div id="sidebar">
+  <div id="app" class="d-flex">
+    <div id="sidebar" class="d-flex flex-column">
       <h2>Правила</h2>
-      <div id="ruleList"></div>
-      <button id="addRuleBtn">➕ Добавить правило</button>
-      <button id="exportRulesBtn">⬇ Экспорт</button>
-      <label class="import-label">
+      <div id="ruleList" class="flex-grow-1 overflow-auto"></div>
+      <button id="addRuleBtn" class="btn btn-primary mb-2">➕ Добавить группу</button>
+      <button id="exportRulesBtn" class="btn btn-primary mb-2">⬇ Экспорт</button>
+      <label class="import-label btn btn-success">
         ⬆ Импорт
         <input type="file" id="importRulesInput" accept="application/json" hidden />
       </label>
     </div>
-
-    <div id="main">
+    <div id="main" class="flex-grow-1 p-3">
       <div id="ruleDetailsContainer"></div>
-      <div class="actions">
-        <button id="saveRulesBtn">💾 Сохранить все правила</button>
+      <div class="actions text-end">
+        <button id="saveRulesBtn" class="btn btn-primary">💾 Сохранить все правила</button>
       </div>
     </div>
   </div>
-
-  <div id="notification"></div>
+  <div id="notification" class="position-fixed bottom-0 end-0 m-3"></div>
   <script src="options.js"></script>
 </body>
 </html>

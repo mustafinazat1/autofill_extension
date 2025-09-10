@@ -5,14 +5,15 @@ injectedScript.src = chrome.runtime.getURL("injected.js");
 injectedScript.onload = () => console.debug("injected.js добавлен в страницу:", window.location.href);
 document.documentElement.appendChild(injectedScript);
 
-chrome.storage.sync.get(["rules"], ({ rules }) => {
-  console.debug("Получены правила:", rules);
-  if (!rules || !Array.isArray(rules)) {
-    console.debug("Правила отсутствуют или некорректны");
+chrome.storage.sync.get(["groups"], ({ groups }) => {
+  console.debug("Получены группы:", groups);
+  if (!groups || !Array.isArray(groups)) {
+    console.debug("Группы отсутствуют или некорректны");
     return;
   }
+  
   setTimeout(async () => {
-    const matchedRules = findMatchingRules(rules, window.location.href, true);
+    const matchedRules = findMatchingRules(groups, window.location.href, true);
 
     if (!matchedRules.length) {
       console.debug("Подходящее правило не найдено для URL:", window.location.href);

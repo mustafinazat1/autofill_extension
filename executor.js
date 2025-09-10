@@ -113,13 +113,23 @@ function matchUrlByMask(mask, url) {
   return maskToRegex(mask).test(url);
 }
 
-function findMatchingRules(rules, url, autoRun) {
-  console.debug("Поиск подходящего правила для URL:", url);
-  return rules.filter(rule => {
-    const autorunOk = (rule.autoRun == autoRun || !autoRun);
-    const matched = matchUrlByMask(rule.url, url);
-    return autorunOk && matched;
-  })};
+function findMatchingRules(groups, url, autoRun) {
+  console.debug("Поиск подходящих правил для URL:", url);
+  const matchingRules = [];
+  for (const group of groups) {
+    if (!group.rules || !Array.isArray(group.rules)) {
+      console.debug("Группа не содержит корректных правил:", group.groupName);
+      continue;
+    }
+    const groupMatchingRules = group.rules.filter(rule => {
+      const autorunOk = (rule.autoRun === autoRun || !autoRun);
+      const matched = matchUrlByMask(rule.url, url);
+      return autorunOk && matched;
+    });
+    matchingRules.push(...groupMatchingRules);
+  }
+  return matchingRules;
+}
 
 window.executeRule = executeRule;
 window.findMatchingRules = findMatchingRules;
