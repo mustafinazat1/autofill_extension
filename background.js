@@ -57,64 +57,57 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
           }, 2000);
         }
 
-function getChromeLikeSelector(el) {
-  if (!(el instanceof Element)) return '';
+function getChromeCopySelector(element) {
+  if (!(element instanceof Element)) return '';
 
-  // Если есть id — сразу возвращаем
-  if (el.id) return `#${el.id}`;
+  const path = [];
 
-  const parts = [];
-  let current = el;
+  while (element && element.nodeType === Node.ELEMENT_NODE) {
+    let selector = element.nodeName.toLowerCase();
 
-  while (current && current.nodeType === Node.ELEMENT_NODE) {
-    let selector = current.nodeName.toLowerCase();
-
-    // Добавляем классы (если они помогают уточнить)
-    if (current.classList.length > 0) {
-      const cls = Array.from(current.classList).join('.');
-      if (cls) selector += '.' + cls;
-    }
-
-    // Добавляем полезные атрибуты (Chrome тоже так делает)
-    const attrPriority = ['name', 'type', 'value', 'data-*', 'title', 'role'];
-    for (let attr of current.attributes) {
-      if (
-        attrPriority.includes(attr.name) ||
-        attr.name.startsWith('data-')
-      ) {
-        selector += `[${attr.name}="${attr.value}"]`;
-      }
-    }
-
-    // Проверяем уникальность
-    const testSelector = [...parts, selector].join(' > ');
-    if (document.querySelectorAll(testSelector).length === 1) {
-      parts.unshift(selector);
+    // Если у элемента есть id → это всегда финал
+    if (element.id) {
+      selector = `#${element.id}`;
+      path.unshift(selector);
       break;
     }
 
-    // Если не уникально — уточняем nth-of-type
-    const parent = current.parentNode;
+    // Берём классы, если они есть
+    if (element.className) {
+      const classNames = element.className
+        .trim()
+        .split(/\s+/)
+        .filter(c => !!c)
+        .join('.');
+      if (classNames.length > 0) {
+        selector += '.' + classNames;
+      }
+    }
+
+    // Проверяем: уникален ли этот селектор среди соседей
+    const parent = element.parentNode;
     if (parent) {
-      const sameTypeSiblings = Array.from(parent.children)
-        .filter(e => e.nodeName === current.nodeName);
-      if (sameTypeSiblings.length > 1) {
-        const index = sameTypeSiblings.indexOf(current) + 1;
+      const sameTagSiblings = Array.from(parent.children)
+        .filter(e => e.nodeName === element.nodeName);
+
+      if (sameTagSiblings.length > 1) {
+        const index = sameTagSiblings.indexOf(element) + 1;
         selector += `:nth-of-type(${index})`;
       }
     }
 
-    parts.unshift(selector);
-    current = current.parentNode;
+    path.unshift(selector);
+    element = element.parentNode;
   }
 
-  return parts.join(' > ');
+  return path.join(' > ');
 }
 
 
 
 
-        const selector = getChromeLikeSelector(el);
+
+        const selector = getChromeCopySelector(el);
         navigator.clipboard.writeText(selector).then(() => showToast(el, selector));
       }
     });
@@ -359,125 +352,148 @@ function getChromeLikeSelector(el) {
           }
           return '/' + parts.join('/');
         }
-function getChromeLikeSelector(el) {
-  if (!(el instanceof Element)) return '';
 
-  // Если есть id — сразу возвращаем
-  if (el.id) return `#${el.id}`;
 
-  const parts = [];
-  let current = el;
+function getChromeCopySelector(element) {
+  if (!(element instanceof Element)) return '';
 
-  while (current && current.nodeType === Node.ELEMENT_NODE) {
-    let selector = current.nodeName.toLowerCase();
+  const path = [];
 
-    // Добавляем классы (если они помогают уточнить)
-    if (current.classList.length > 0) {
-      const cls = Array.from(current.classList).join('.');
-      if (cls) selector += '.' + cls;
-    }
+  while (element && element.nodeType === Node.ELEMENT_NODE) {
+    let selector = element.nodeName.toLowerCase();
 
-    // Добавляем полезные атрибуты (Chrome тоже так делает)
-    const attrPriority = ['name', 'type', 'value', 'data-*', 'title', 'role'];
-    for (let attr of current.attributes) {
-      if (
-        attrPriority.includes(attr.name) ||
-        attr.name.startsWith('data-')
-      ) {
-        selector += `[${attr.name}="${attr.value}"]`;
-      }
-    }
-
-    // Проверяем уникальность
-    const testSelector = [...parts, selector].join(' > ');
-    if (document.querySelectorAll(testSelector).length === 1) {
-      parts.unshift(selector);
+    // Если у элемента есть id → это всегда финал
+    if (element.id) {
+      selector = `#${element.id}`;
+      path.unshift(selector);
       break;
     }
 
-    // Если не уникально — уточняем nth-of-type
-    const parent = current.parentNode;
+    // Берём классы, если они есть
+    if (element.className) {
+      const classNames = element.className
+        .trim()
+        .split(/\s+/)
+        .filter(c => !!c)
+        .join('.');
+      if (classNames.length > 0) {
+        selector += '.' + classNames;
+      }
+    }
+
+    // Проверяем: уникален ли этот селектор среди соседей
+    const parent = element.parentNode;
     if (parent) {
-      const sameTypeSiblings = Array.from(parent.children)
-        .filter(e => e.nodeName === current.nodeName);
-      if (sameTypeSiblings.length > 1) {
-        const index = sameTypeSiblings.indexOf(current) + 1;
+      const sameTagSiblings = Array.from(parent.children)
+        .filter(e => e.nodeName === element.nodeName);
+
+      if (sameTagSiblings.length > 1) {
+        const index = sameTagSiblings.indexOf(element) + 1;
         selector += `:nth-of-type(${index})`;
       }
     }
 
-    parts.unshift(selector);
-    current = current.parentNode;
+    path.unshift(selector);
+    element = element.parentNode;
   }
 
-  return parts.join(' > ');
+  return path.join(' > ');
 }
 
 
+function generateSelectors(element) {
+  const tag = element.tagName.toLowerCase();
+  const list = [];
 
-
-
-        function generateSelectors(element) {
-          const tag = element.tagName.toLowerCase();
-          const list = [];
-          list.push({ type: "CSS", value: getChromeLikeSelector(element) });
-          // По ID
-          if (element.id) {
-            list.push({ type: "By ID", value: `#${element.id}` });
-            list.push({ type: "Tag+ID", value: `${tag}#${element.id}` });
-          }
-
-          // По классу
-          if (element.classList.length > 0) {
-            const classSelector = '.' + Array.from(element.classList).join('.');
-            list.push({ type: "By Class", value: `${tag}${classSelector}` });
-          }
-
-          // По стандартным атрибутам
-          ["name", "type", "title", "placeholder"].forEach(attr => {
-            if (element.hasAttribute(attr)) {
-              list.push({
-                type: `By [${attr}]`,
-                value: `${tag}[${attr}="${element.getAttribute(attr)}"]`
-              });
-            }
-          });
-
-          // По data-* атрибутам
-          Array.from(element.attributes).forEach(attr => {
-            if (attr.name.startsWith("data-")) {
-              list.push({
-                type: `By ${attr.name}`,
-                value: `${tag}[${attr.name}="${attr.value}"]`
-              });
-            }
-          });
-
-          // По nth-of-type (fallback)
-          if (element.parentNode) {
-            const siblings = Array.from(element.parentNode.children)
-              .filter(e => e.tagName === element.tagName);
-            if (siblings.length > 1) {
-              const index = siblings.indexOf(element) + 1;
-              list.push({ type: "nth-of-type", value: `${tag}:nth-of-type(${index})` });
-            }
-          }
-
-          // XPath полный
-          list.push({ type: "XPath", value: getXPath(element) });
-
-          // XPath по тексту
-          const text = (element.textContent || "").trim();
-          if (text) {
-            const shortText = text.length > 20 ? text.slice(0, 20) + "…" : text;
-            list.push({
-              type: "XPath contains(text)",
-              value: `//${tag}[contains(normalize-space(.), "${shortText}")]`
-            });
-          }
-
-          return list;
+  function makeUniqueCss(selector, element) {
+    const matches = document.querySelectorAll(selector);
+    if (matches.length === 1) return selector;
+    if (matches.length > 1) {
+      // усиливаем nth-of-type
+      const parent = element.parentNode;
+      if (parent) {
+        const siblings = Array.from(parent.children).filter(e => e.tagName === element.tagName);
+        if (siblings.length > 1) {
+          const index = siblings.indexOf(element) + 1;
+          return selector + `:nth-of-type(${index})`;
         }
+      }
+    }
+    return selector; // fallback
+  }
+
+  function makeUniqueXPath(xpath, element) {
+    const result = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+    if (result.snapshotLength === 1) return xpath;
+    // добавляем [1], [2] и т.п. если совпадает больше
+    for (let i = 0; i < result.snapshotLength; i++) {
+      if (result.snapshotItem(i) === element) {
+        return `(${xpath})[${i + 1}]`;
+      }
+    }
+    return xpath; // fallback
+  }
+
+  // Основной "как у Chrome"
+  list.push({ type: "CSS", value: makeUniqueCss(getChromeCopySelector(element), element) });
+
+  // По ID
+  if (element.id) {
+    list.push({ type: "By ID", value: `#${element.id}` });
+    list.push({ type: "Tag+ID", value: `${tag}#${element.id}` });
+  }
+
+  // По классу
+  if (element.classList.length > 0) {
+    const classSelector = '.' + Array.from(element.classList).join('.');
+    list.push({ type: "By Class", value: makeUniqueCss(`${tag}${classSelector}`, element) });
+  }
+
+  // По стандартным атрибутам
+  ["name", "type", "title", "placeholder"].forEach(attr => {
+    if (element.hasAttribute(attr)) {
+      list.push({
+        type: `By [${attr}]`,
+        value: makeUniqueCss(`${tag}[${attr}="${element.getAttribute(attr)}"]`, element)
+      });
+    }
+  });
+
+  // По data-* атрибутам
+  Array.from(element.attributes).forEach(attr => {
+    if (attr.name.startsWith("data-")) {
+      list.push({
+        type: `By ${attr.name}`,
+        value: makeUniqueCss(`${tag}[${attr.name}="${attr.value}"]`, element)
+      });
+    }
+  });
+
+  // По nth-of-type (fallback)
+  if (element.parentNode) {
+    const siblings = Array.from(element.parentNode.children).filter(e => e.tagName === element.tagName);
+    if (siblings.length > 1) {
+      const index = siblings.indexOf(element) + 1;
+      list.push({ type: "nth-of-type", value: `${tag}:nth-of-type(${index})` });
+    }
+  }
+
+  // XPath полный
+  list.push({ type: "XPath", value: makeUniqueXPath(getXPath(element), element) });
+
+  // XPath по тексту
+  const text = (element.textContent || "").trim();
+  if (text) {
+    const shortText = text.length > 20 ? text.slice(0, 20) + "…" : text;
+    list.push({
+      type: "XPath contains(text)",
+      value: makeUniqueXPath(`//${tag}[contains(normalize-space(.), "${shortText}")]`, element)
+    });
+  }
+
+  return list;
+}
+
 
         function showSelectorPanel(element, selectors) {
           const rect = element.getBoundingClientRect();
