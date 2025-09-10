@@ -113,13 +113,13 @@ function matchUrlByMask(mask, url) {
   return maskToRegex(mask).test(url);
 }
 
-function findMatchingRule(rules, url, autoRun) {
+function findMatchingRules(rules, url, autoRun) {
   console.debug("Поиск подходящего правила для URL:", url);
-  return rules.find(rule => {
+  return rules.filter(rule => {
     const autorunOk = (rule.autoRun == autoRun || !autoRun);
     const matched = matchUrlByMask(rule.url, url);
     return autorunOk && matched;
   })};
 
 window.executeRule = executeRule;
-window.findMatchingRule = findMatchingRule;
+window.findMatchingRules = findMatchingRules;
