@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const ruleSelect = document.getElementById("ruleSelect");
   const fillButton = document.getElementById("fillButton");
-  const executeButton = document.getElementById("executeButton");
   const settingsLink = document.getElementById("settingsLink");
   const notification = document.getElementById("notification");
 
@@ -14,37 +13,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }, duration);
   }
 
-  function maskToRegex(mask) {
-  // Экранируем спецсимволы регулярок кроме * и #
-  let regexStr = mask.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
-
-  // * → любой набор символов
-  regexStr = regexStr.replace(/\*/g, ".*");
-
-  // # → только цифры
-  regexStr = regexStr.replace(/#/g, "[0-9]+");
-
-  return new RegExp("^" + regexStr + "$");
-}
-
-function matchUrlByMask(mask, url) {
-  return maskToRegex(mask).test(url);
-}
-
-function findMatchingRule(rules, url, autoRun) {
-  console.debug("Поиск подходящего правила для URL:", url);
-  return rules.find(rule => {
-    const autorunOk = (rule.autoRun == autoRun || !autoRun);
-    const matched = matchUrlByMask(rule.url, url);
-    return autorunOk && matched;
-  })};
-
   // Загрузка правил и заполнение селектора
   chrome.storage.sync.get(["rules"], ({ rules }) => {
     if (!rules || !Array.isArray(rules) || rules.length === 0) {
       ruleSelect.innerHTML = '<option value="">Нет доступных правил</option>';
       fillButton.disabled = true;
-      executeButton.disabled = true;
       return;
     }
 
@@ -91,32 +64,6 @@ function findMatchingRule(rules, url, autoRun) {
             }
           },
           args: [rule]
-        }, () => showNotification("Правило выполнено!"));
-      });
-    });
-  });
-
-  // Кнопка "Выполнить" — автопоиск по URL
-  executeButton.addEventListener("click", () => {
-    chrome.storage.sync.get(["rules"], ({ rules }) => {
-      if (!rules || !Array.isArray(rules)) return showNotification("Правила отсутствуют!");
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (!tabs.length) return showNotification("Активная вкладка не найдена!");
-        const tab = tabs[0];
-
-        const matchingRule = findMatchingRule(rules, tab.url);
-        if (!matchingRule) return showNotification("Подходящее правило не найдено!");
-
-        chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          func: (rule) => {
-            if (window.executeRule) {
-              window.executeRule(rule);
-            } else {
-              console.error("executeRule не найден в контенте страницы!");
-            }
-          },
-          args: [matchingRule]
         }, () => showNotification("Правило выполнено!"));
       });
     });
