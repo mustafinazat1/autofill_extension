@@ -396,75 +396,88 @@ function getChromeCopySelector(element) {
 
 
 
+function cssEscape(value) {
+  if (window.CSS && CSS.escape) {
+    return CSS.escape(value);
+  }
+  // полифилл
+  return value.replace(/["\\]/g, '\\$&'); 
+}
+
 function generateSelectors(element) {
   const tag = element.tagName.toLowerCase();
   const list = [];
 
   function makeUniqueCss(selector, element) {
-    const matches = document.querySelectorAll(selector);
-    if (matches.length === 1) return selector;
-    if (matches.length > 1) {
-      // усиливаем nth-of-type
-      const parent = element.parentNode;
-      if (parent) {
-        const siblings = Array.from(parent.children).filter(e => e.tagName === element.tagName);
-        if (siblings.length > 1) {
-          const index = siblings.indexOf(element) + 1;
-          return selector + `:nth-of-type(${index})`;
+    try {
+      const matches = document.querySelectorAll(selector);
+      if (matches.length === 1) return selector;
+      if (matches.length > 1) {
+        // усиливаем nth-of-type
+        const parent = element.parentNode;
+        if (parent) {
+          const siblings = Array.from(parent.children).filter(e => e.tagName === element.tagName);
+          if (siblings.length > 1) {
+            const index = siblings.indexOf(element) + 1;
+            return selector + `:nth-of-type(${index})`;
+          }
         }
       }
+      return selector;
+    } catch (e) {
+      console.warn("Invalid selector skipped:", selector, e);
+      return null;
     }
-    return selector; // fallback
   }
 
   function makeUniqueXPath(xpath, element) {
     const result = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     if (result.snapshotLength === 1) return xpath;
-    // добавляем [1], [2] и т.п. если совпадает больше
     for (let i = 0; i < result.snapshotLength; i++) {
       if (result.snapshotItem(i) === element) {
         return `(${xpath})[${i + 1}]`;
       }
     }
-    return xpath; // fallback
+    return xpath;
   }
 
   // Основной "как у Chrome"
-  list.push({ type: "CSS", value: makeUniqueCss(getChromeCopySelector(element), element) });
+  const chromeSelector = getChromeCopySelector(element);
+  const uniqueChrome = makeUniqueCss(chromeSelector, element);
+  if (uniqueChrome) list.push({ type: "CSS", value: uniqueChrome });
 
   // По ID
   if (element.id) {
-    list.push({ type: "By ID", value: `#${element.id}` });
-    list.push({ type: "Tag+ID", value: `${tag}#${element.id}` });
+    list.push({ type: "By ID", value: `#${cssEscape(element.id)}` });
+    list.push({ type: "Tag+ID", value: `${tag}#${cssEscape(element.id)}` });
   }
 
   // По классу
   if (element.classList.length > 0) {
-    const classSelector = '.' + Array.from(element.classList).join('.');
-    list.push({ type: "By Class", value: makeUniqueCss(`${tag}${classSelector}`, element) });
+    const classSelector = '.' + Array.from(element.classList).map(cssEscape).join('.');
+    const classSel = makeUniqueCss(`${tag}${classSelector}`, element);
+    if (classSel) list.push({ type: "By Class", value: classSel });
   }
 
   // По стандартным атрибутам
   ["name", "type", "title", "placeholder"].forEach(attr => {
     if (element.hasAttribute(attr)) {
-      list.push({
-        type: `By [${attr}]`,
-        value: makeUniqueCss(`${tag}[${attr}="${element.getAttribute(attr)}"]`, element)
-      });
+      const val = cssEscape(element.getAttribute(attr));
+      const sel = makeUniqueCss(`${tag}[${attr}="${val}"]`, element);
+      if (sel) list.push({ type: `By [${attr}]`, value: sel });
     }
   });
 
   // По data-* атрибутам
   Array.from(element.attributes).forEach(attr => {
     if (attr.name.startsWith("data-")) {
-      list.push({
-        type: `By ${attr.name}`,
-        value: makeUniqueCss(`${tag}[${attr.name}="${attr.value}"]`, element)
-      });
+      const val = cssEscape(attr.value);
+      const sel = makeUniqueCss(`${tag}[${attr.name}="${val}"]`, element);
+      if (sel) list.push({ type: `By ${attr.name}`, value: sel });
     }
   });
 
-  // По nth-of-type (fallback)
+  // По nth-of-type
   if (element.parentNode) {
     const siblings = Array.from(element.parentNode.children).filter(e => e.tagName === element.tagName);
     if (siblings.length > 1) {
@@ -479,15 +492,16 @@ function generateSelectors(element) {
   // XPath по тексту
   const text = (element.textContent || "").trim();
   if (text) {
-    const shortText = text.length > 200 ? text.slice(0, 200) + "" : text;
+    const shortText = text.length > 200 ? text.slice(0, 200) : text;
     list.push({
       type: "XPath contains(text)",
-      value: makeUniqueXPath(`//${tag}[contains(normalize-space(.), "${shortText}")]`, element)
+      value: makeUniqueXPath(`//${tag}[contains(normalize-space(.), "${shortText.replace(/"/g, '\\"')}")]`, element)
     });
   }
 
   return list;
 }
+
 
 
         function showSelectorPanel(element, selectors) {
