@@ -65,31 +65,36 @@ function getChromeCopySelector(element) {
   while (element && element.nodeType === Node.ELEMENT_NODE) {
     let selector = element.nodeName.toLowerCase();
 
-    // Если у элемента есть id → это всегда финал
-    if (element.id) {
-      selector = `#${element.id}`;
+    // Если у элемента есть корректный id → используем его и выходим
+    if (
+      element.id &&
+      typeof element.id === 'string' &&
+      element.id.trim() !== ''
+    ) {
+      selector = `#${CSS.escape(element.id)}`;
       path.unshift(selector);
       break;
     }
 
-    // Берём классы, если они есть
-    if (element.className) {
+    // Берём классы, если они есть и строковые
+    if (element.className && typeof element.className === 'string') {
       const classNames = element.className
         .trim()
         .split(/\s+/)
-        .filter(c => !!c)
+        .filter(Boolean)
+        .map(c => CSS.escape(c))
         .join('.');
       if (classNames.length > 0) {
         selector += '.' + classNames;
       }
     }
 
-    // Проверяем: уникален ли этот селектор среди соседей
+    // Добавляем :nth-of-type, если siblings одного типа больше одного
     const parent = element.parentNode;
     if (parent) {
-      const sameTagSiblings = Array.from(parent.children)
-        .filter(e => e.nodeName === element.nodeName);
-
+      const sameTagSiblings = Array.from(parent.children).filter(
+        e => e.nodeName === element.nodeName
+      );
       if (sameTagSiblings.length > 1) {
         const index = sameTagSiblings.indexOf(element) + 1;
         selector += `:nth-of-type(${index})`;
@@ -102,10 +107,6 @@ function getChromeCopySelector(element) {
 
   return path.join(' > ');
 }
-
-
-
-
 
         const selector = getChromeCopySelector(el);
         navigator.clipboard.writeText(selector).then(() => showToast(el, selector));
@@ -328,30 +329,43 @@ function getChromeCopySelector(element) {
           }, 2000);
         }
 
-        function getXPath(element) {
-          if (!element) return '';
-          if (element.id) return `//*[@id="${element.id}"]`;
-          const parts = [];
-          let current = element;
-          while (current && current.nodeType === Node.ELEMENT_NODE) {
-            if (current.id) {
-              parts.unshift(`*[@id="${current.id}"]`);
-              break;
-            }
-            let index = 1;
-            let sibling = current.previousSibling;
-            while (sibling) {
-              if (sibling.nodeType === Node.ELEMENT_NODE && sibling.tagName === current.tagName) {
-                index++;
-              }
-              sibling = sibling.previousSibling;
-            }
-            const tag = current.tagName.toLowerCase();
-            parts.unshift(`${tag}[${index}]`);
-            current = current.parentNode;
-          }
-          return '/' + parts.join('/');
-        }
+function getXPath(element) {
+  if (!element || element.nodeType !== Node.ELEMENT_NODE) return '';
+
+  // Если есть корректный id (строка и не пустая)
+  if (element.id && typeof element.id === 'string' && element.id.trim() !== '') {
+    return `//*[@id="${element.id}"]`;
+  }
+
+  const parts = [];
+  let current = element;
+
+  while (current && current.nodeType === Node.ELEMENT_NODE) {
+    if (current.id && typeof current.id === 'string' && current.id.trim() !== '') {
+      parts.unshift(`*[@id="${current.id}"]`);
+      break;
+    }
+
+    let index = 1;
+    let sibling = current.previousSibling;
+
+    while (sibling) {
+      if (
+        sibling.nodeType === Node.ELEMENT_NODE &&
+        sibling.tagName === current.tagName
+      ) {
+        index++;
+      }
+      sibling = sibling.previousSibling;
+    }
+
+    const tag = current.tagName.toLowerCase();
+    parts.unshift(`${tag}[${index}]`);
+    current = current.parentNode;
+  }
+
+  return '/' + parts.join('/');
+}
 
 
 function getChromeCopySelector(element) {
@@ -362,31 +376,36 @@ function getChromeCopySelector(element) {
   while (element && element.nodeType === Node.ELEMENT_NODE) {
     let selector = element.nodeName.toLowerCase();
 
-    // Если у элемента есть id → это всегда финал
-    if (element.id) {
-      selector = `#${element.id}`;
+    // Если у элемента есть корректный id → используем его и выходим
+    if (
+      element.id &&
+      typeof element.id === 'string' &&
+      element.id.trim() !== ''
+    ) {
+      selector = `#${CSS.escape(element.id)}`;
       path.unshift(selector);
       break;
     }
 
-    // Берём классы, если они есть
-    if (element.className) {
+    // Берём классы, если они есть и строковые
+    if (element.className && typeof element.className === 'string') {
       const classNames = element.className
         .trim()
         .split(/\s+/)
-        .filter(c => !!c)
+        .filter(Boolean)
+        .map(c => CSS.escape(c))
         .join('.');
       if (classNames.length > 0) {
         selector += '.' + classNames;
       }
     }
 
-    // Проверяем: уникален ли этот селектор среди соседей
+    // Добавляем :nth-of-type, если siblings одного типа больше одного
     const parent = element.parentNode;
     if (parent) {
-      const sameTagSiblings = Array.from(parent.children)
-        .filter(e => e.nodeName === element.nodeName);
-
+      const sameTagSiblings = Array.from(parent.children).filter(
+        e => e.nodeName === element.nodeName
+      );
       if (sameTagSiblings.length > 1) {
         const index = sameTagSiblings.indexOf(element) + 1;
         selector += `:nth-of-type(${index})`;
@@ -479,7 +498,7 @@ function generateSelectors(element) {
   }
 
   // XPath полный
-  list.push({ type: "XPath", value: makeUniqueXPath(getXPath(element), element) });
+  list.push({ type: "XPath", value: getXPath(element) });
 
   // XPath по тексту
   const text = (element.textContent || "").trim();
