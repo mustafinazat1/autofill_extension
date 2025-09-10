@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Примеры использования расширения</title>
+    <title>Примеры использования и создание правил для расширения</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -168,10 +168,12 @@
         <h3>Шаг 2: Получите селекторы</h3>
         <ul>
             <li>Используйте контекстное меню (<strong>Copy CSS Selector</strong>, <strong>Copy XPath</strong>, или <strong>Copy Selector Variants</strong>) для получения селекторов целевых элементов.</li>
-            <li>Проверьте селекторы:
+            <li>Для сложных или скрытых элементов (например, элементы в теневом DOM или динамически генерируемые элементы) используйте <strong>Инструменты разработчика (DevTools)</strong>:
                 <ul>
-                    <li>Для CSS: используйте <code>document.querySelector("селектор")</code> в консоли браузера.</li>
-                    <li>Для XPath: используйте <code>document.evaluate("селектор", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue</code>.</li>
+                    <li>Откройте DevTools (F12 или правый клик → "Исследовать элемент").</li>
+                    <li>Найдите нужный элемент в дереве DOM.</li>
+                    <li>Скопируйте CSS-селектор или XPath через контекстное меню DevTools (правый клик на элемент → "Copy" → "Copy selector" или "Copy XPath").</li>
+                    <li>Проверьте селектор в консоли DevTools, чтобы убедиться, что он находит правильный элемент.</li>
                 </ul>
             </li>
             <li>Выбирайте наиболее надёжные селекторы:
@@ -236,7 +238,7 @@
         </ul>
 
         <div class="note">
-            <p><strong>Совет</strong>: Для сложных страниц используйте <strong>Copy Selector Variants</strong>, чтобы выбрать наиболее устойчивый селектор. Тестируйте правила на разных сценариях, чтобы учесть возможные изменения DOM.</p>
+            <p><strong>Совет</strong>: Для сложных селекторов, особенно для скрытых или динамически генерируемых элементов, используйте DevTools для точного определения селекторов. Это особенно важно для элементов в теневом DOM или с изменяющейся структурой. Тестируйте правила на разных сценариях, чтобы учесть возможные изменения DOM.</p>
         </div>
     </div>
 
