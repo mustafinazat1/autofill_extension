@@ -76,20 +76,7 @@ function getChromeCopySelector(element) {
       break;
     }
 
-    // Берём классы, если они есть и строковые
-    if (element.className && typeof element.className === 'string') {
-      const classNames = element.className
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean)
-        .map(c => CSS.escape(c))
-        .join('.');
-      if (classNames.length > 0) {
-        selector += '.' + classNames;
-      }
-    }
-
-    // Добавляем :nth-of-type, если siblings одного типа больше одного
+    // Проверяем :nth-of-type среди соседей
     const parent = element.parentNode;
     if (parent) {
       const sameTagSiblings = Array.from(parent.children).filter(
@@ -107,6 +94,7 @@ function getChromeCopySelector(element) {
 
   return path.join(' > ');
 }
+
 
         const selector = getChromeCopySelector(el);
         navigator.clipboard.writeText(selector).then(() => showToast(el, selector));
@@ -387,20 +375,7 @@ function getChromeCopySelector(element) {
       break;
     }
 
-    // Берём классы, если они есть и строковые
-    if (element.className && typeof element.className === 'string') {
-      const classNames = element.className
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean)
-        .map(c => CSS.escape(c))
-        .join('.');
-      if (classNames.length > 0) {
-        selector += '.' + classNames;
-      }
-    }
-
-    // Добавляем :nth-of-type, если siblings одного типа больше одного
+    // Проверяем :nth-of-type среди соседей
     const parent = element.parentNode;
     if (parent) {
       const sameTagSiblings = Array.from(parent.children).filter(
@@ -418,6 +393,7 @@ function getChromeCopySelector(element) {
 
   return path.join(' > ');
 }
+
 
 
 function generateSelectors(element) {
