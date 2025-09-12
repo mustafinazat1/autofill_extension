@@ -3,8 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <title>Autofill Rules</title>
-  <link href="bootstrap.min.css" rel="stylesheet">
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/drawflow/drawflow.min.css">
   <link rel="stylesheet" href="options.css" />
+  <style>
+    #app { height: 100vh; }
+    #sidebar { width: 250px; border-right: 1px solid #ccc; padding: 10px; }
+    #main { flex-grow: 1; display: flex; flex-direction: column; }
+    #drawflow { flex-grow: 1; border: 1px solid #ccc; }
+    #stepPalette .step-type { cursor: grab; }
+  </style>
 </head>
 <body>
   <div id="app" class="d-flex">
@@ -13,19 +21,67 @@
       <div id="ruleList" class="flex-grow-1 overflow-auto"></div>
       <button id="addRuleBtn" class="btn btn-primary mb-2">➕ Добавить группу</button>
       <button id="exportRulesBtn" class="btn btn-primary mb-2">⬇ Экспорт</button>
-      <label class="import-label btn btn-success">
+      <label class="import-label btn btn-success mb-2">
         ⬆ Импорт
         <input type="file" id="importRulesInput" accept="application/json" hidden />
       </label>
+
+      <h5 class="mt-3">Типы шагов</h5>
+      <div id="stepPalette">
+        <div class="step-type btn btn-outline-primary w-100 mb-2" draggable="true" data-type="fill">✏️ Заполнить</div>
+        <div class="step-type btn btn-outline-primary w-100 mb-2" draggable="true" data-type="click">🖱️ Клик</div>
+        <div class="step-type btn btn-outline-primary w-100 mb-2" draggable="true" data-type="wait">⏱️ Ожидание</div>
+        <div class="step-type btn btn-outline-primary w-100 mb-2" draggable="true" data-type="check">✅ Проверка</div>
+      </div>
     </div>
-    <div id="main" class="flex-grow-1 p-3">
+
+    <div id="main" class="p-3">
       <div id="ruleDetailsContainer"></div>
-      <div class="actions text-end">
+      <div id="drawflow"></div>
+      <div class="actions text-end mt-2">
         <button id="saveRulesBtn" class="btn btn-primary">💾 Сохранить все правила</button>
       </div>
     </div>
   </div>
+
   <div id="notification" class="position-fixed bottom-0 end-0 m-3"></div>
+
+  <!-- Модалка редактирования шага -->
+  <div class="modal fade" id="stepEditorModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Редактирование шага</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label">Селектор</label>
+            <input type="text" id="stepSelector" class="form-control">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Значение</label>
+            <input type="text" id="stepValue" class="form-control">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Описание</label>
+            <input type="text" id="stepDescription" class="form-control">
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="stepEnabled">
+            <label class="form-check-label" for="stepEnabled">Включено</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+          <button class="btn btn-primary" id="saveStepBtn">Сохранить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="vendor/drawflow/drawflow.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="options.js"></script>
 </body>
 </html>
