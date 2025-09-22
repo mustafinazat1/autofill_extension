@@ -364,13 +364,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const desc = escapeHtml(nodeData.description || '');
     const isFirst = nodeData.isFirst ? 'start-node' : '';
     const checked = nodeData.enabled !== false ? 'checked' : '';
+    // Get the first selector's value (if any) and truncate to 30 characters
+    const selectorValue = nodeData.selectors && nodeData.selectors.length > 0 
+      ? escapeHtml(nodeData.selectors[0].value || '').substring(0, 30) + (nodeData.selectors[0].value.length > 30 ? '...' : '')
+      : '';
+    // Get the node's value (if any)
+    const value = escapeHtml(nodeData.value || '');
+    // Combine description, value, and selector into the node description
+    const nodeDescContent = [
+      desc,
+      value ? `Value: ${value}` : '',
+      selectorValue ? `Selector: ${selectorValue}` : ''
+    ].filter(Boolean).join('<br>');
+    
     content.innerHTML = `
       <div class="${isFirst}">
         <label class="node-toggle">
           <input type="checkbox" class="node-enabled" ${checked}>
           <b>${type}</b>
         </label>
-        <span class="node-desc">${desc}</span>
+        <span class="node-desc">${nodeDescContent}</span>
       </div>
     `;
     const checkbox = content.querySelector('.node-enabled');
